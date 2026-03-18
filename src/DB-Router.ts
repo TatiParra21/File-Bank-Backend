@@ -52,6 +52,18 @@ router.post("/log-in", asyncHandler(async(req:Request,res:Response<LogInResponse
     return 
 }))
 
+router.post("/log-out", asyncHandler(async(req:Request,res:Response<{loggedOut:boolean}>)=>{   
+    res.clearCookie("token",{
+         httpOnly: true,
+        sameSite: "lax",
+        secure: false,
+    })
+    res.json({ loggedOut: true})  
+    return
+ 
+    
+}))
+
 router.post("/resend-verification", asyncHandler(async(req:Request,res:Response)=>{
     const {email, password} = req.body   
     const user= await prisma.users.findUnique({where:{email:email}})
