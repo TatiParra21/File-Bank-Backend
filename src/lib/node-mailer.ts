@@ -2,7 +2,7 @@ import nodemailer from 'nodemailer'
 
 import dotenv from "dotenv";
 dotenv.config();
-
+import { AppError } from '../AppError';
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST as string,
   port: Number(process.env.SMTP_PORT),
@@ -26,6 +26,7 @@ export const sendVerificationEmail = async (email: string, token:string) => {
   });
 console.log(transport, "transport")
   } catch (err: any) {
+    console.error(`Email sending failed:`, err);
   // Common Nodemailer error codes: EAUTH, ECONNECTION, ETIMEDOUT
   if (err.code === 'EAUTH') {
     console.error("Authentication failed: Check SMTP_USER and SMTP_PASS.");
@@ -34,6 +35,7 @@ console.log(transport, "transport")
   } else {
     console.error(`Email error: ${err.message}`, "THEE ERROR");
   }
+   throw new AppError("Failed to send verification email. Please try again.", 500);
 }
  
 };

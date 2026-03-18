@@ -4,11 +4,12 @@ dotenv.config();
 import express from 'express'
 import cors from 'cors'
 import { router } from './DB-Router'
-import { prisma } from './db'
+import { prisma } from './lib/prismaDB'
 import cookieParser from "cookie-parser"
 import type { Request, Response, NextFunction } from "express"
-
-import { authMiddleWare } from './authMiddleWare'
+import asyncHandler from "express-async-handler"
+import { Prisma } from "../generated/prisma/client";
+import { authMiddleWare } from './Middlewares/authMiddleWare'
 const app = express()
 app.use(express.json())
 app.use(cors())
@@ -40,5 +41,22 @@ app.get("me",authMiddleWare,(req:Request,res:Response)=>{
     user: req.user
   })
 })
+app.use((err: any, req: Request, res: Response, next: NextFunction) => {
+  console.error("[Global Error Logger]:", err);
+  // Format a consistent error response for your frontend
+  const statusCode = err.statusCode || 500;
+  const message = err.message || "An unexpected error occurred.";
+   // 1. Is it a known Prisma error for a duplicate email?
+  if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === "P2002") {
+      return res.status(400).json({ 
+          success: false, 
+          error: "An account with this email already exists." 
+      });
+  }
+ return res.status(statusCode).json({
+    success: false,
+    error: message,
+  });
+});
 
 app.listen(PORT,()=>{console.log(`Server running at http://localhost:${PORT}`)})

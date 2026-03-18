@@ -1,18 +1,15 @@
 import type { Request, Response, NextFunction } from "express"
 import jwt from "jsonwebtoken"
 
-
+import { AppError } from "../AppError"
 export const authMiddleWare =(req:Request, res:Response, next:NextFunction)=>{
         const token = req.cookies.token
-        if(!token)return res.status(401).json({ message: "Not authenticated" })
+        if(!token)return next(new AppError("Not authenticated",401)) 
           try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any;
         req.user = decoded; // Assuming you've extended the Request type
-        console.log(decoded, "decoded")
         next();
     } catch (err) {
-    return res.status(401).json({ message: "invalid or expired token" });
-}
-
-
+    return next(new AppError("Invalid or expired token", 401))
+  }
 }
