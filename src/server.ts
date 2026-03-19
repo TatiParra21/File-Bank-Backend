@@ -10,6 +10,7 @@ import type { Request, Response, NextFunction } from "express"
 import asyncHandler from "express-async-handler"
 import { Prisma } from "../generated/prisma/client";
 import { authMiddleWare } from './Middlewares/authMiddleWare'
+import jwt from "jsonwebtoken";
 const app = express()
 app.use(express.json())
 app.use(cors({
@@ -39,9 +40,24 @@ app.get("/verify",async(req:Request,res:Response)=>{
     })
    return res.redirect('http://localhost:3000')
 }),
-app.get("/check-user",authMiddleWare,(req:Request,res:Response)=>{
-    
+
+
+app.get("/check-user",(req:Request,res:Response)=>{
+      const token = req.cookies.token
+            console.log(token, "TOKEN??")
+            if(!token)return res.status(401).json({
+        authenticated: false,
+        user: null
+      })
+        const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any;
+        if(!decoded.verified)return res.status(401).json({
+        authenticated: false,
+        user: null
+      })   
+            req.user = decoded; // Assuming you've extended the Request type 
+            console.log(req, "req")
      return res.status(200).json({
+      authenticated: true,
     user: req.user
   })
 })
