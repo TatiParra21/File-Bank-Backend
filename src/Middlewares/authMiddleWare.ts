@@ -5,8 +5,10 @@ import { AppError } from "../AppError"
 export const authMiddleWare =(req:Request, res:Response, next:NextFunction)=>{
         const token = req.cookies.token
         if(!token)return next(new AppError("Not authenticated",401)) 
+           const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any;
+          if(!decoded.verified)return next(new AppError("user not verified",401)) 
           try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any;
+       
         req.user = decoded; // Assuming you've extended the Request type
         next();
     } catch (err) {

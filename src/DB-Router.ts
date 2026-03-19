@@ -42,7 +42,7 @@ router.post("/log-in", asyncHandler(async(req:Request,res:Response<LogInResponse
    if (!user || !(await bcrypt.compare(password, user.password_hash))|| !user.verified) {
  throw new AppError("Invalid Email or password",401)
 }  
-    const token = jwt.sign({userId:user.id,email:user.email},process.env.JWT_SECRET!, {expiresIn:"1d"})
+    const token = jwt.sign({userId:user.id,email:user.email, verified:user.verified},process.env.JWT_SECRET!, {expiresIn:"1d"})
      res.cookie("token", token, {
         httpOnly: true,
         sameSite: "lax",

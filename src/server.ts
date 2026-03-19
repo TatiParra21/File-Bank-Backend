@@ -12,7 +12,10 @@ import { Prisma } from "../generated/prisma/client";
 import { authMiddleWare } from './Middlewares/authMiddleWare'
 const app = express()
 app.use(express.json())
-app.use(cors())
+app.use(cors({
+  origin: "http://localhost:3000",
+  credentials: true
+}))
 app.use(cookieParser())
 
 app.use("/file-bank",router)
@@ -35,7 +38,7 @@ app.get("/verify",async(req:Request,res:Response)=>{
     })
    return res.redirect('http://localhost:3000')
 }),
-app.get("me",authMiddleWare,(req:Request,res:Response)=>{
+app.get("/check-user",authMiddleWare,(req:Request,res:Response)=>{
     
      return res.status(200).json({
     user: req.user
