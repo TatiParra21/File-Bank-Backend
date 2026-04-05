@@ -11,6 +11,7 @@ import jwt from 'jsonwebtoken'
 export const router : Router = express.Router()
 import dotenv from "dotenv";
 import { authMiddleWare } from './Middlewares/authMiddleWare'
+
 import asyncHandler from "express-async-handler"
 import { AppError } from './AppError';
 dotenv.config();

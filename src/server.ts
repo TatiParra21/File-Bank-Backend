@@ -11,6 +11,8 @@ import asyncHandler from "express-async-handler"
 import { Prisma } from "../generated/prisma/client";
 import { authMiddleWare } from './Middlewares/authMiddleWare'
 import jwt from "jsonwebtoken";
+import multerRouter from './multerRequests'
+
 const app = express()
 app.use(express.json())
 app.use(cors({
@@ -21,7 +23,7 @@ app.use(cors({
 app.use(cookieParser())
 
 app.use("/file-bank",router)
-
+app.use("/uploads", multerRouter);
 const PORT = 400
 app.get("/verify",async(req:Request,res:Response)=>{
     const token = req.query.token as string
